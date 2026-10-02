@@ -97,11 +97,17 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
               badge: overdue.length ? { value: overdue.length, tone: "crit", title: `${overdue.length} overdue tasks` } : undefined,
               content: (
                 <>
-                  <Section eyebrow="Case journey" title="Key moments in the case" intro="The legal milestones from the crash to today, then the appointments and open tasks still ahead. Scroll sideways for more; the full record is on the Timeline tab.">
-                    <CaseJourney events={journey(events, today)} today={today} />
-                  </Section>
+                  <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+                    {/* On wide screens the journey takes the brief's height (contain:size keeps its long list from setting the row height) and scrolls inside. */}
+                    <Card className="flex flex-col gap-3 lg:min-h-[560px] lg:[contain:size]">
+                      <div className="grid gap-1">
+                        <div className="font-mono text-[11.5px] font-medium uppercase tracking-wider text-legal">Case journey</div>
+                        <h2 className="font-serif text-[22px] font-semibold">Key moments in the case</h2>
+                        <p className="text-[14px] text-muted">The legal milestones from the crash to today, then the appointments and open tasks still ahead. The full record is on the Timeline tab.</p>
+                      </div>
+                      <CaseJourney events={journey(events, today)} today={today} vertical />
+                    </Card>
 
-                  <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
                     {aiBrief ? (
                       <CaseBrief brief={aiBrief} sources={sourceIndex(data)} />
                     ) : (
@@ -143,33 +149,33 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                       <p className="text-[12.5px] text-muted">Use Refresh from Clio for an AI summary of the case and of what changed since your last visit.</p>
                     </Card>
                     )}
-
-                    <Card className="grid content-start gap-4">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h2 className="font-serif text-[22px] font-semibold">Needs attention</h2>
-                        <span className="text-[13px] text-muted tabular">
-                          {pending.length} open tasks{overdue.length ? `, ${overdue.length} overdue` : ""}
-                        </span>
-                      </div>
-                      <ul className="grid gap-2.5">
-                        {pending.map((t) => {
-                          const late = t.date < today;
-                          return (
-                            <li key={t.id} className={`grid gap-1 rounded-lg border p-3 ${late ? "border-crit bg-crit-soft" : "border-line"}`}>
-                              <div className="flex flex-wrap items-center justify-between gap-2">
-                                <span className="font-medium leading-snug">{t.title}</span>
-                                <Pill tone={late ? "crit" : "warn"}>{late ? `Overdue · due ${fmtDate(t.date)}` : `Due ${fmtDate(t.date)}`}</Pill>
-                              </div>
-                              <p className="text-[13px] text-muted">{t.body}</p>
-                              <div>
-                                <Cite source={t.source} />
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </Card>
                   </div>
+
+                  <Card className="grid content-start gap-4">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h2 className="font-serif text-[22px] font-semibold">Needs attention</h2>
+                      <span className="text-[13px] text-muted tabular">
+                        {pending.length} open tasks{overdue.length ? `, ${overdue.length} overdue` : ""}
+                      </span>
+                    </div>
+                    <ul className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3">
+                      {pending.map((t) => {
+                        const late = t.date < today;
+                        return (
+                          <li key={t.id} className={`grid gap-1 rounded-lg border p-3 ${late ? "border-crit bg-crit-soft" : "border-line"}`}>
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="font-medium leading-snug">{t.title}</span>
+                              <Pill tone={late ? "crit" : "warn"}>{late ? `Overdue · due ${fmtDate(t.date)}` : `Due ${fmtDate(t.date)}`}</Pill>
+                            </div>
+                            <p className="text-[13px] text-muted">{t.body}</p>
+                            <div>
+                              <Cite source={t.source} />
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </Card>
                 </>
               ),
             },

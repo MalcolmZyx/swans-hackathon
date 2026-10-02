@@ -1,83 +1,91 @@
 @import "tailwindcss";
 
-/* Palette: cool slate neutrals; ink blue for the legal side, clinical teal for the medical side. */
+/* ROSS design tokens (DESIGN.md §7.2). Meaning is fixed: red = late only; amber = sensitive or not
+   confirmed; green = good news; accent blue = tappable; ink = the single primary action. */
 :root {
-  --bg: #f4f6f9;
+  --bg: #f4f5f7;
   --surface: #ffffff;
-  --sunk: #eceff4;
-  --ink: #18212f;
-  --muted: #5a6577;
-  --line: #dce1e9;
-  --legal: #2f45a6;
-  --legal-soft: #e7eafb;
-  --med: #0d7a67;
-  --med-soft: #e0f3ef;
-  --warn: #9a5306;
-  --warn-soft: #fdf0dd;
-  --crit: #b42318;
-  --crit-soft: #fde8e6;
-  --ok: #157a3c;
-  --k-milestone: #18212f;
-  --k-note: #2f45a6;
-  --k-email: #7446b8;
-  --k-call: #a33f8f;
-  --k-calendar: #0d7a67;
-  --k-task: #9a5306;
-  --k-document: #566173;
-  --k-charge: #b42318;
-  /* Case journey: a warm-to-cool sequence, one color per milestone */
-  --j1: #d24b42;
-  --j2: #df7a1c;
-  --j3: #c99a06;
-  --j4: #4b8f3c;
-  --j5: #1d93a8;
-  --j6: #3566c8;
-  --j7: #2b3a67;
-}
+  --surface-2: #f9fafb;
+  --line: #e6e8ec;
+  --line-2: #eef0f3;
+  --ink: #0e1726;
+  --ink-2: #364152;
+  --muted: #6b7485;
+  --faint: #98a1b1;
+  --accent: #2b59f5;
+  --accent-ink: #1c3fc4;
+  --accent-soft: #eef2ff;
+  --red: #d92d20;
+  --red-soft: #fef1f0;
+  --amber: #c2620a;
+  --amber-soft: #fff5e8;
+  --green: #0a8a4f;
+  --green-soft: #ecfaf2;
+  --violet: #6e4ae0;
+  --violet-soft: #f3efff;
+  --teal: #0e8a9a;
+  --teal-soft: #e9f8fa;
+  /* entry kinds */
+  --k-note: #6e4ae0;
+  --k-email: #2b59f5;
+  --k-call: #0e8a9a;
+  --k-task: #c2620a;
+  --k-event: #0a8a4f;
+  --k-calendar: #0a8a4f;
+  --k-document: #364152;
+  --k-expense: #98a1b1;
+  --k-charge: #98a1b1;
+  --k-milestone: #0e1726;
+  --r: 14px;
+  --r-sm: 9px;
+  --shadow: 0 1px 2px rgba(14, 23, 38, 0.04), 0 1px 1px rgba(14, 23, 38, 0.03);
+  --shadow-lg: 0 18px 50px -12px rgba(14, 23, 38, 0.25), 0 2px 6px rgba(14, 23, 38, 0.06);
+  --hl: #fff1b8;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e131a;
-    --surface: #161d27;
-    --sunk: #1d2531;
-    --ink: #e5e9ef;
-    --muted: #9aa4b3;
-    --line: #2a3442;
-    --legal: #9aa9ff;
-    --legal-soft: #20284a;
-    --med: #4fd0b4;
-    --med-soft: #133a33;
-    --warn: #f0a54a;
-    --warn-soft: #3a2a14;
-    --crit: #f58b80;
-    --crit-soft: #3f1d1a;
-    --ok: #5cd38a;
-    --k-milestone: #e5e9ef;
-    --k-note: #9aa9ff;
-    --k-email: #c09af2;
-    --k-call: #ec8fd6;
-    --k-calendar: #4fd0b4;
-    --k-task: #f0a54a;
-    --k-document: #a6b0bf;
-    --k-charge: #f58b80;
-    --j1: #f2827a;
-    --j2: #f4a35a;
-    --j3: #e6c34a;
-    --j4: #7fc56e;
-    --j5: #5ccbdc;
-    --j6: #86a8f2;
-    --j7: #b4c0e6;
-    color-scheme: dark;
-  }
+  /* Older component names, mapped onto the ROSS palette. */
+  --sunk: var(--surface-2);
+  --legal: var(--accent);
+  --legal-soft: var(--accent-soft);
+  --med: var(--green);
+  --med-soft: var(--green-soft);
+  --warn: var(--amber);
+  --warn-soft: var(--amber-soft);
+  --crit: var(--red);
+  --crit-soft: var(--red-soft);
+  --ok: var(--green);
+  --j1: #d92d20;
+  --j2: #c2620a;
+  --j3: #b58900;
+  --j4: #0a8a4f;
+  --j5: #0e8a9a;
+  --j6: #2b59f5;
+  --j7: #6e4ae0;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-sunk: var(--sunk);
-  --color-ink: var(--ink);
-  --color-muted: var(--muted);
+  --color-surface-2: var(--surface-2);
   --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-green: var(--green);
+  --color-green-soft: var(--green-soft);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-teal: var(--teal);
+  --color-hl: var(--hl);
+  --color-sunk: var(--sunk);
   --color-legal: var(--legal);
   --color-legal-soft: var(--legal-soft);
   --color-med: var(--med);
@@ -87,25 +95,308 @@
   --color-crit: var(--crit);
   --color-crit-soft: var(--crit-soft);
   --color-ok: var(--ok);
-  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
-  --font-serif: var(--font-serif4), Georgia, serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-inter: var(--font-inter-face), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius-r: var(--r);
+  --radius-r-sm: var(--r-sm);
+  --shadow-soft: var(--shadow);
+  --shadow-lg: var(--shadow-lg);
 }
 
 body {
-  background: var(--bg);
+  background: var(--surface);
   color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   text-wrap: balance;
 }
 
-.tabular {
+.tabular,
+.num {
   font-variant-numeric: tabular-nums;
 }
 
-/* Glossary terms: dotted underline with a definition on hover or focus. */
+/* Section label: 12px uppercase muted (§7.3). */
+.label {
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Buttons (§7.4). Press: 1px down, scale .985. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.08s, background 0.15s, border-color 0.15s;
+}
+.btn:hover {
+  border-color: #d3d7de;
+  background: var(--surface-2);
+}
+.btn:active {
+  transform: translateY(1px) scale(0.985);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn.sm {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+  border-radius: 9px;
+}
+.btn.primary {
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 13px;
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+.btn.primary:hover {
+  background: #1d2a3f;
+}
+.btn.blue {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.btn.blue:hover {
+  background: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Cite chip: inline superscript, accent-soft, fills accent on hover (§7.4). */
+.cite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  margin: 0 1px;
+  border-radius: 5px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: super;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.12s, color 0.12s;
+}
+.cite:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* List rows (§7.4). */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line-2);
+  text-align: left;
+  font-size: 14.5px;
+}
+.row:last-child {
+  border-bottom: 0;
+}
+.row:hover .row-title {
+  color: var(--accent);
+}
+.dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+}
+
+/* iOS switch (§7.4). */
+.switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+}
+.switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: 99px;
+  background: #e3e6eb;
+  transition: background 0.18s;
+}
+.switch span::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 99px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(14, 23, 38, 0.22);
+  transition: transform 0.18s;
+}
+.switch input:checked + span {
+  background: var(--green);
+}
+.switch.amber input:checked + span {
+  background: var(--amber);
+}
+.switch input:checked + span::after {
+  transform: translateX(18px);
+}
+.switch input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.switch.lg {
+  width: 51px;
+  height: 31px;
+}
+.switch.lg span::after {
+  width: 27px;
+  height: 27px;
+}
+.switch.lg input:checked + span::after {
+  transform: translateX(20px);
+}
+
+/* Sheets (§6.4): slide up 220ms, backdrop fade 200ms. */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.sheet-backdrop {
+  animation: fade-in 0.2s ease-out both;
+}
+.sheet {
+  animation: sheet-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Highlight pulse 1.2s once; the doctor's active dot every 2s (§7.5). */
+@keyframes hl-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 214, 10, 0.75);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(255, 214, 10, 0);
+  }
+}
+.hl-rect {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 2px;
+  background: rgba(255, 214, 10, 0.38);
+  outline: 2px solid rgba(240, 160, 0, 0.9);
+  animation: hl-pulse 1.2s ease-out 1;
+}
+mark {
+  background: var(--hl);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(10, 138, 79, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(10, 138, 79, 0);
+  }
+}
+.alive-dot {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 99px;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+.toast {
+  animation: toast-in 0.18s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet-backdrop,
+  .hl-rect,
+  .alive-dot,
+  .toast {
+    animation: none;
+  }
+}
+
+/* Glossary terms (older components): dotted underline with a definition on hover or focus. */
 .term {
   position: relative;
   border-bottom: 1px dotted currentColor;
@@ -126,7 +417,6 @@ h1, h2, h3 {
   font-size: 12.5px;
   line-height: 1.45;
   font-weight: 400;
-  font-family: var(--font-plex-sans), system-ui, sans-serif;
   text-transform: none;
   letter-spacing: normal;
   white-space: normal;
@@ -134,9 +424,4 @@ h1, h2, h3 {
 .term:hover .term-def,
 .term:focus .term-def {
   display: block;
-}
-.term:focus {
-  outline: 2px solid var(--legal);
-  outline-offset: 2px;
-  border-radius: 2px;
 }

@@ -1,24 +1,25 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { clioUrl } from "./clio";
-import type { CaseData, CaseEvent, Party } from "./types";
+import type { CaseData, CaseEvent, Party, PdfCite } from "./types";
 
 const CASE_FILE = path.join(process.cwd(), "data", "case.json");
 
+/** Today, or AS_OF (YYYY-MM-DD) to freeze it for demos and tests. */
 export function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return process.env.AS_OF || new Date().toLocaleDateString("en-CA");
 }
 
-// Give every source object an "Open in Clio" link.
-function addLinks(node: unknown, matterId: number, base: string): void {
+// Keep only the PDF passages in documents this viewer may open.
+function restrictPdfs(node: unknown, allowed: Set<number>): void {
   if (Array.isArray(node)) {
-    node.forEach((n) => addLinks(n, matterId, base));
+    node.forEach((n) => restrictPdfs(n, allowed));
   } else if (node && typeof node === "object") {
     const obj = node as Record<string, unknown>;
-    if ("api" in obj && "recordId" in obj && "kind" in obj) {
-      obj.href = clioUrl(obj as never, matterId, base);
+    if ("api" in obj && "recordId" in obj && Array.isArray(obj.pdf)) {
+      obj.pdf = (obj.pdf as PdfCite[]).filter((c) => allowed.has(c.doc));
+      return;
     }
-    Object.values(obj).forEach((v) => addLinks(v, matterId, base));
+    Object.values(obj).forEach((v) => restrictPdfs(v, allowed));
   }
 }
 
@@ -29,9 +30,7 @@ export async function loadCase(): Promise<CaseData | null> {
   } catch {
     return null;
   }
-  const data = JSON.parse(raw) as CaseData;
-  addLinks(data, data.matter.id, data.clioBase);
-  return data;
+  return JSON.parse(raw) as CaseData;
 }
 
 export function medicalProviders(data: CaseData): Party[] {
@@ -46,9 +45,13 @@ export function journey<T extends CaseEvent>(events: T[], today: string): T[] {
 /**
  * What a medical provider may see. Filtering happens here on the server, so attorney notes,
  * legal case facts, insurer correspondence and other providers' bills never reach the browser.
+ * Source passages are cut to the PDFs this provider may see, everywhere in `data` (this request's
+ * copy), so it also covers sources the page reads from `data` directly.
  */
 export function providerView(data: CaseData, providerId: number) {
   const shared = <T extends { audience: string }>(items: T[]) => items.filter((i) => i.audience !== "legal");
+  const theirs = shared(data.documents).filter((d) => d.providerIds.includes(providerId));
+  restrictPdfs(data, new Set(theirs.map((d) => Number(d.source.recordId))));
   return {
     matter: { ...data.matter, sol: undefined },
     facts: shared(data.facts),

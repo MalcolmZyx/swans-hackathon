@@ -20,3 +20,9 @@ export function relative(date: string, today: string): string {
   const unit = abs < 45 ? `${abs} day${abs === 1 ? "" : "s"}` : abs < 365 ? `${Math.round(abs / 30)} months` : `${(abs / 365).toFixed(1)} years`;
   return d > 0 ? `in ${unit}` : `${unit} ago`;
 }
+
+/** "Sep 9" within the current year, "Sep 9, 2025" otherwise (DESIGN.md §8). */
+export function shortDate(iso: string | null | undefined, today: string): string {
+  if (!iso) return "—";
+  return fmtDate(iso, iso.slice(0, 4) === today.slice(0, 4) ? { month: "short", day: "numeric" } : { month: "short", day: "numeric", year: "numeric" });
+}

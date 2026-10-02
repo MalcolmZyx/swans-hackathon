@@ -8,7 +8,21 @@ export type Source = {
   field: string;
   label: string;
   api: string;
-  href?: string; // added by lib/data.ts
+  pdf?: PdfCite[]; // passages in the case PDFs that support this value, best first
+  quote?: string; // the sentence to highlight in the record body
+};
+
+/** A passage in one of the case PDFs (served by /api/documents?id=). */
+export type PdfCite = {
+  doc: number; // Clio document id
+  name: string; // file name
+  title: string;
+  folder: string;
+  page: number; // 1-based
+  pages: number;
+  size: [number, number]; // page width and height in points, as displayed
+  rects: [number, number, number, number][]; // highlighted lines: x0, y0, x1, y1 as fractions of the page
+  text: string; // the highlighted text
 };
 
 export type EventKind = "milestone" | "note" | "email" | "call" | "calendar" | "task" | "document" | "charge";
@@ -21,6 +35,7 @@ export type CaseEvent = {
   body: string;
   audience: Audience;
   providerIds: number[];
+  counterpartIds?: number[];
   milestone?: string; // key moment in the legal case
   medicalMilestone?: string; // key moment in the patient's treatment
   status?: "pending" | "complete";
@@ -31,6 +46,7 @@ export type CaseEvent = {
   start?: string;
   end?: string;
   folder?: string;
+  filename?: string;
   amount?: number;
   source: Source;
 };
