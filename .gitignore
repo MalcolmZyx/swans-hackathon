@@ -1,6 +1,9 @@
 # Secrets
 .env
 .clio_token.json
+# Client data pulled from Clio
+data/
+dashboard/data/
 
 # Python
 __pycache__/
