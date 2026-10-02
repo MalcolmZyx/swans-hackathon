@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F6F7F9">
+  <title>Patient update · ROSS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/provider.css">
+</head>
+<body class="portal">
+  <main class="pv-shell" id="pv"><div class="pv-loading"><div class="spinner"></div></div></main>
+  <script type="module">
+    import { renderProviderView, attachProviderView, requestMailto } from '/provider-view.js';
+    const root = document.getElementById('pv');
+    const token = location.pathname.split('/').filter(Boolean).pop() || '';
+    let view;
+    try {
+      const res = await fetch(`/api/p/${encodeURIComponent(token)}`);
+      view = await res.json().catch(() => ({ error: 'This link could not be loaded. Contact the firm for a new one.' }));
+      if (!res.ok && !view.error) view = { error: 'This link is no longer active. Contact the firm for a new one.' };
+    } catch {
+      view = { error: 'We could not reach the server. Check your connection and try again.' };
+    }
+    root.innerHTML = renderProviderView(view);
+    if (view?.patient?.name) document.title = `${view.patient.name} · Patient update`;
+    if (!view.error) attachProviderView(root, token);
+    const rs = document.getElementById('pvreqs');
+    if (rs) rs.onclick = (e) => { e.preventDefault(); location.href = requestMailto(view, document.getElementById('pvreqt').value, document.getElementById('pvreqm').value); };
+    if (new URLSearchParams(location.search).get('view') === 'demo') {
+      document.body.insertAdjacentHTML('afterbegin', '<div class="pv-demo"><nav class="pv-seg" aria-label="Switch view"><a href="/case">Lawyer</a><a class="on" href="#">Doctor</a></nav><select class="pv-hosp" aria-label="Hospital or office"></select></div>');
+      const sel = document.querySelector('.pv-hosp');
+      fetch('/api/demo/providers').then(r => r.json()).then(list => {
+        sel.innerHTML = list.map(p => `<option value="${p.id}">${p.name.replace(/[<&]/g, '')}</option>`).join('');
+        const cur = list.find(p => p.name === view.provider?.name); if (cur) sel.value = cur.id;
+        sel.onchange = () => { location.href = `/doctor?provider=${sel.value}`; };
+      });
+    }
+  </script>
+</body>
+</html>

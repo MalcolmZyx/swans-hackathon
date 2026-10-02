@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROSS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27black%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-family=%27-apple-system,Helvetica%27 font-weight=%27800%27 font-size=%2716%27 fill=%27white%27 text-anchor=%27middle%27%3ER%3C/text%3E%3C/svg%3E">
+  <style>
+    :root { --ink: #1d1d1f; --muted: #6e6e73; --faint: #86868b; --bg: #f5f5f7; --line: #d2d2d7; --accent: #0071e3; --green: #1d8a3a;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #fff; color: var(--ink); font: 17px/1.47 var(--font); letter-spacing: -0.022em; -webkit-font-smoothing: antialiased; }
+    .w { min-height: 100vh; display: grid; place-items: center; padding: 40px 22px; }
+    .step { width: min(640px, 100%); text-align: center; animation: in .7s cubic-bezier(.16,1,.3,1) both; }
+    .step[hidden] { display: none; }
+    @keyframes in { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: none; } }
+    .out { animation: out .35s ease both; } @keyframes out { to { opacity: 0; transform: translateY(-12px); } }
+    .brand { font-weight: 800; letter-spacing: .14em; font-size: 22px; color: #000; }
+    h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1.05; letter-spacing: -0.04em; font-weight: 700; margin: 28px 0 0; }
+    h2 { font-size: 32px; letter-spacing: -0.03em; font-weight: 700; margin: 0; }
+    .lead { font-size: 21px; color: var(--muted); margin: 18px auto 0; max-width: 520px; letter-spacing: -0.02em; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 54px; padding: 0 32px; margin-top: 36px; border: 0; border-radius: 27px; background: var(--accent); color: #fff; font: 500 17px var(--font); cursor: pointer; text-decoration: none; transition: background .2s, transform .15s; }
+    .btn:hover { background: #0077ed; } .btn:active { transform: scale(.98); }
+    .btn.dark { background: var(--ink); } .btn.dark:hover { background: #000; }
+    .fine { margin-top: 18px; font-size: 13px; color: var(--faint); }
+    .fine b { color: var(--ink); font-weight: 600; }
+    .clio { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; background: #fff; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .checks { list-style: none; padding: 0; margin: 34px auto 0; width: min(380px, 100%); text-align: left; display: grid; gap: 14px; }
+    .checks li { display: flex; align-items: center; gap: 14px; font-size: 17px; color: var(--faint); transition: color .3s; }
+    .checks li i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; transition: all .3s; }
+    .checks li.doing { color: var(--ink); } .checks li.doing i { border-color: var(--ink); border-top-color: transparent; animation: spin .8s linear infinite; }
+    .checks li.done { color: var(--ink); } .checks li.done i { background: var(--green); border-color: var(--green); }
+    .checks li.done i::after { content: ""; width: 9px; height: 5px; border: solid #fff; border-width: 0 0 2px 2px; transform: rotate(-45deg) translate(1px, -1px); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .who { margin-top: 10px; font-size: 15px; color: var(--muted); }
+    .search { width: 100%; height: 50px; margin-top: 26px; border: 0; border-radius: 25px; background: var(--bg); padding: 0 22px; font: 17px var(--font); color: var(--ink); outline: none; }
+    .search:focus { background: #fff; box-shadow: 0 0 0 1px var(--line), 0 10px 30px -12px rgba(0,0,0,.2); }
+    .matter { display: flex; align-items: center; gap: 18px; width: 100%; margin-top: 14px; padding: 20px 22px; border: 0; border-radius: 22px; background: var(--bg); text-align: left; cursor: pointer; font: inherit; color: inherit; transition: transform .25s cubic-bezier(.2,.8,.2,1), background .2s; }
+    .matter:hover { background: #ededf0; transform: scale(1.01); }
+    .av { width: 58px; height: 58px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 20px; background: linear-gradient(160deg, #3a3a3c, #1d1d1f); }
+    .matter b { display: block; font-size: 21px; font-weight: 700; letter-spacing: -0.025em; }
+    .matter span { display: block; font-size: 14.5px; color: var(--muted); margin-top: 2px; }
+    .matter .go { margin-left: auto; color: var(--accent); font-size: 15px; white-space: nowrap; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .tags em { font-style: normal; font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 99px; background: #fff; color: var(--ink); }
+    .tags em.red { color: #e30000; }
+    .role { display: flex; justify-content: center; gap: 10px; margin-top: 22px; }
+    .role a { font-size: 15px; color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+<main class="w">
+  <!-- 1 · Connect -->
+  <section class="step" id="s1">
+    <div class="brand">ROSS</div>
+    <h1>Every case.<br>Explained in two minutes.</h1>
+    <p class="lead">ROSS reads your matter in Clio and tells you what changed, what needs you, and where it says so.</p>
+    <button class="btn" id="connect"><span class="clio">c</span>Connect Clio</button>
+    <p class="fine"><b>Read-only.</b> ROSS can't create, edit or delete anything in Clio.</p>
+  </section>
+
+  <!-- 2 · Connecting (real checks against the server) -->
+  <section class="step" id="s2" hidden>
+    <div class="brand">ROSS</div>
+    <h2 style="margin-top:28px">Connecting to Clio</h2>
+    <div class="who" id="who">&nbsp;</div>
+    <ul class="checks">
+      <li data-k="auth"><i></i>Signed in to Clio</li>
+      <li data-k="matter"><i></i>Found the matter</li>
+      <li data-k="read"><i></i>Read notes, emails, tasks and documents</li>
+      <li data-k="ready"><i></i>Case ready</li>
+    </ul>
+  </section>
+
+  <!-- 3 · Pick the patient -->
+  <section class="step" id="s3" hidden>
+    <div class="brand">ROSS</div>
+    <h2 style="margin-top:28px">Which client?</h2>
+    <div class="who" id="who2"></div>
+    <input class="search" id="q" placeholder="Search clients" aria-label="Search clients" autocomplete="off">
+    <div id="list"></div>
+    <div class="role"><a href="/doctor">Or see what a doctor sees ›</a></div>
+  </section>
+</main>
+<script type="module">
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day = (d) => { if (!d) return ''; const [y, m, dd] = d.slice(0, 10).split('-').map(Number); return `${MON[m - 1]} ${dd}, ${y}`; };
+  const go = async (from, to) => { $(from).classList.add('out'); await wait(320); $(from).hidden = true; $(from).classList.remove('out'); $(to).hidden = false; };
+  const mark = (k, st) => { const li = document.querySelector(`[data-k="${k}"]`); li.className = st; };
+
+  $('#connect').onclick = async () => {
+    const status = await fetch('/api/clio/status').then(r => r.json()).catch(() => null);
+    // No saved Clio login on this server: do the real OAuth sign-in.
+    if (!status || status.mode !== 'live') { location.href = '/auth/clio'; return; }
+    await go('#s1', '#s2');
+    mark('auth', 'doing'); await wait(500);
+    $('#who').textContent = status.connectedAs ? `as ${status.connectedAs}` : 'Saved Clio login';
+    mark('auth', 'done'); mark('matter', 'doing'); await wait(450);
+    mark('matter', 'done'); mark('read', 'doing');
+    const t0 = Date.now();
+    const data = await fetch('/api/case').then(r => r.json());
+    await wait(Math.max(0, 900 - (Date.now() - t0)));
+    $('[data-k="read"]').lastChild.textContent = `Read ${data.meta.items} entries and ${data.meta.documents.length} documents`;
+    mark('read', 'done'); mark('ready', 'doing'); await wait(400); mark('ready', 'done'); await wait(450);
+    showPicker(status, data);
+  };
+
+  async function showPicker(status, data) {
+    const h = data.facts.hero, k = data.facts.kpis, od = data.facts.work?.overdue || [];
+    const ini = (h.client || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('');
+    const rows = [{ name: h.client, html: `<button class="matter" data-open>
+      <div class="av">${esc(ini)}</div>
+      <div><b>${esc(h.client)}</b><span>${esc(data.meta.matter?.displayNumber || status.matter || '')} · Injured ${esc(day(h.doi))} · ${esc(h.stage)}</span>
+        <div class="tags"><em>Worth $${Math.round(k.caseValue?.value || 0).toLocaleString('en-US')}</em><em>Insurance $${Math.round(k.coverage?.value || 0).toLocaleString('en-US')}</em>${od.length ? `<em class="red">${od.length} overdue</em>` : ''}</div></div>
+      <span class="go">Open ›</span></button>` }];
+    $('#who2').textContent = `${status.connectedAs ? `${status.connectedAs} · ` : ''}Clio live · ${rows.length} active matter${rows.length > 1 ? 's' : ''}`;
+    const draw = () => { const q = $('#q').value.toLowerCase(); $('#list').innerHTML = rows.filter(r => r.name.toLowerCase().includes(q)).map(r => r.html).join('') || '<p class="fine">No client matches.</p>'; document.querySelectorAll('[data-open]').forEach(b => b.onclick = async () => { $('#s3').classList.add('out'); await wait(300); location.href = '/case'; }); };
+    $('#q').oninput = draw; draw();
+    await go('#s2', '#s3');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Uploaded with `railway up --no-gitignore`, so the Sapini PDFs and the OCR cache ship
+# but secrets, local databases and dependencies do not.
+.env
+.git/
+node_modules/
+data/caselight.db*
+data/pages/
+data/photos/
+docs/

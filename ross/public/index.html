@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROSS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27black%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-family=%27-apple-system,Helvetica%27 font-weight=%27800%27 font-size=%2716%27 fill=%27white%27 text-anchor=%27middle%27%3ER%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/provider.css">
+</head>
+<body class="cl">
+  <div id="banner"></div>
+  <header class="c-top">
+    <a class="c-brand" href="/" aria-label="ROSS home">ROSS</a>
+    <nav class="c-seg" aria-label="Switch view"><a class="on" href="/case">Lawyer</a><a href="/doctor">Doctor</a></nav>
+    <span class="c-spacer"></span>
+    <span class="c-ro" id="ro"><i></i>Read-only from Clio</span>
+    <a class="c-connect" id="connect" href="/auth/clio" hidden>Connect Clio</a>
+  </header>
+  <main class="c-page" id="app"><div class="c-loading"><div class="spinner"></div><div>Reading the matter from Clio…</div></div></main>
+  <div id="sheets"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
