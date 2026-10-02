@@ -1,0 +1,9 @@
+# Secrets
+.env
+.clio_token.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
