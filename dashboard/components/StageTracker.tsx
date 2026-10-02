@@ -16,17 +16,14 @@ export function StageTracker({ stages, current, source }: { stages: string[]; cu
   const idx = stages.indexOf(current);
   return (
     <div className="grid gap-3">
-      <ol className="flex flex-wrap gap-1.5" aria-label="Case stages">
+      <ol className="grid grid-flow-col auto-cols-[minmax(76px,1fr)] gap-1.5 overflow-x-auto pb-0.5" aria-label="Case stages">
         {stages.map((s, i) => (
-          <li
-            key={s}
-            aria-current={i === idx ? "step" : undefined}
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] ${
-              i === idx ? "bg-legal font-semibold text-surface" : i < idx ? "bg-legal-soft text-ink" : "bg-sunk text-muted"
-            }`}
-          >
-            {i < idx && <span aria-hidden="true">✓</span>}
-            {s}
+          <li key={s} aria-current={i === idx ? "step" : undefined} className="grid gap-1.5">
+            <span aria-hidden="true" className={`h-1.5 rounded-full ${i === idx ? "bg-accent" : i < idx ? "bg-accent/30" : "bg-line"}`} />
+            <span className={`truncate text-[12.5px] ${i === idx ? "font-bold text-ink" : i < idx ? "text-ink-2" : "text-faint"}`}>
+              {i < idx && <span aria-hidden="true">✓ </span>}
+              {s}
+            </span>
           </li>
         ))}
       </ol>

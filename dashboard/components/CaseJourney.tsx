@@ -43,10 +43,10 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
 
   const controls = (
     <div className="flex flex-wrap items-center justify-end gap-2 text-[13px]">
-      <button type="button" onClick={() => scrollTo("start")} className="rounded-md border border-line bg-surface px-2.5 py-1 hover:border-legal focus-visible:outline-2 focus-visible:outline-legal">
+      <button type="button" onClick={() => scrollTo("start")} className="btn sm">
         {vertical ? "↑" : "←"} Start
       </button>
-      <button type="button" onClick={() => scrollTo("today")} className="rounded-md bg-ink px-2.5 py-1 font-medium text-surface hover:opacity-90 focus-visible:outline-2 focus-visible:outline-legal">
+      <button type="button" onClick={() => scrollTo("today")} className="btn sm border-ink bg-ink text-white hover:bg-[#1d2a3f]">
         Jump to today
       </button>
     </div>
@@ -59,13 +59,13 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
         <span />
         <div className="relative flex justify-center">
           <Rail future={false} capStart={todayIdx === 0} capEnd={todayIdx === events.length} />
-          <span aria-hidden="true" className="relative z-10 mt-1.5 size-3 rotate-45 bg-legal" />
+          <span aria-hidden="true" className="relative z-10 mt-1.5 size-3 rotate-45 rounded-[2px] bg-accent" />
         </div>
         <div className={`flex items-start gap-2 ${todayIdx === events.length ? "" : "pb-6"}`}>
-          <span className="whitespace-nowrap rounded-full bg-legal px-2.5 py-1 text-[11.5px] font-semibold leading-tight text-surface">
-            Today <span className="font-mono text-[10.5px] font-normal opacity-90">· {fmtDate(today, { month: "short", day: "numeric", year: "numeric" })}</span>
+          <span className="whitespace-nowrap rounded-full bg-accent px-2.5 py-1 text-[11.5px] font-semibold leading-tight text-white">
+            Today <span className="text-[10.5px] font-medium tabular opacity-90">· {fmtDate(today, { month: "short", day: "numeric", year: "numeric" })}</span>
           </span>
-          <span aria-hidden="true" className="mt-3 flex-1 border-t-2 border-dashed border-legal/60" />
+          <span aria-hidden="true" className="mt-3 flex-1 border-t-2 border-dashed border-accent/40" />
         </div>
       </li>
     );
@@ -73,7 +73,7 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
     return (
       <div className="flex min-h-0 flex-1 flex-col gap-2">
         {controls}
-        <div ref={scroller} className="max-h-[70vh] min-h-0 flex-1 overflow-y-auto border-t border-line lg:max-h-none">
+        <div ref={scroller} className="max-h-[70vh] min-h-0 flex-1 overflow-y-auto border-t border-line-2 lg:max-h-none">
           <ol className="grid py-5 pr-1" aria-label="Key moments and what is coming up, in order">
             {todayIdx === 0 && todayRow}
             {events.map((m, i) => {
@@ -85,7 +85,7 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
               return [
                 <li key={m.id} className={ROW}>
                   {/* The year only where it changes; the full date is in the caption. */}
-                  <span aria-hidden="true" className="text-right font-serif text-[18px] font-bold leading-none tabular" style={{ color }}>
+                  <span aria-hidden="true" className="text-right text-[15px] font-extrabold leading-none tracking-[-0.02em] tabular" style={{ color }}>
                     {i === 0 || events[i - 1].date.slice(0, 4) !== year ? year : ""}
                   </span>
                   <div className="relative flex justify-center">
@@ -93,13 +93,13 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
                     <span aria-hidden="true" className="relative z-10 mt-0.5 size-3.5 rounded-full border-2" style={{ borderColor: color, background: future ? "var(--surface)" : color }} />
                   </div>
                   <div className={`grid content-start gap-1 ${col === total ? "" : "pb-6"}`}>
-                    <div className="flex flex-wrap items-baseline gap-x-2 font-mono text-[11px] tabular">
+                    <div className="flex flex-wrap items-baseline gap-x-2 text-[12px] tabular">
                       <span className="text-muted">
                         {fmtDate(m.date)}
                         {future && " · upcoming"}
                       </span>
                       {!m.milestone && (
-                        <span className="font-semibold uppercase tracking-wider" style={{ color }}>
+                        <span className="text-[10.5px] font-bold uppercase tracking-[0.06em]" style={{ color }}>
                           {m.kind === "task" ? "Task" : "Appointment"}
                         </span>
                       )}
@@ -108,7 +108,7 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
                       {m.milestone ?? m.title} <Cite source={m.source} className="ml-0.5" />
                     </b>
                     {highlightId != null && m.providerIds.includes(highlightId) && (
-                      <span className="w-fit rounded bg-med px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-surface">Your practice</span>
+                      <span className="w-fit rounded-full bg-teal px-2 py-px text-[10px] font-bold uppercase tracking-[0.04em] text-white">Your practice</span>
                     )}
                     {detail && <p className="line-clamp-2 text-[12.5px] leading-snug text-muted">{detail}</p>}
                   </div>
@@ -125,14 +125,14 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
   return (
     <div className="grid gap-2">
       {controls}
-      <div ref={scroller} className="overflow-x-auto rounded-xl border border-line bg-surface">
+      <div ref={scroller} className="overflow-x-auto rounded-[16px] border border-line bg-surface shadow-soft">
         <ol className="grid min-w-max px-6 py-6" style={{ gridTemplateColumns: columns, gridTemplateRows: "auto 72px auto" }} aria-label="Key moments and what is coming up, in order">
           {/* Today marker: a dashed line through all three rows */}
           <li ref={todayRef} className="relative flex justify-center" style={{ gridColumn: todayIdx + 1, gridRow: "1 / 4" }} aria-label={`Today, ${fmtDate(today)}`}>
-            <span aria-hidden="true" className="absolute inset-y-0 left-1/2 border-l-2 border-dashed border-legal/60" />
-            <span className="relative z-10 h-fit whitespace-nowrap rounded-full bg-legal px-2.5 py-1 text-center text-[11.5px] font-semibold leading-tight text-surface">
+            <span aria-hidden="true" className="absolute inset-y-0 left-1/2 border-l-2 border-dashed border-accent/40" />
+            <span className="relative z-10 h-fit whitespace-nowrap rounded-full bg-accent px-2.5 py-1 text-center text-[11.5px] font-semibold leading-tight text-white">
               Today
-              <span className="block font-mono text-[10.5px] font-normal opacity-90">{fmtDate(today, { month: "short", day: "numeric", year: "numeric" })}</span>
+              <span className="block text-[10.5px] font-medium tabular opacity-90">{fmtDate(today, { month: "short", day: "numeric", year: "numeric" })}</span>
             </span>
           </li>
           <AxisPiece column={todayIdx + 1} future={false} capStart={todayIdx === 0} capEnd={todayIdx === events.length} />
@@ -150,17 +150,17 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
                   {!above && <Ring color={color} future={future} />}
                   <div className={`grid max-w-[180px] gap-1 text-center ${above ? "pb-2" : "pt-2"}`}>
                     {!m.milestone && (
-                      <span className="font-mono text-[10.5px] font-semibold uppercase tracking-wider" style={{ color }}>
+                      <span className="text-[10.5px] font-bold uppercase tracking-[0.06em]" style={{ color }}>
                         {m.kind === "task" ? "Task" : "Appointment"}
                       </span>
                     )}
                     <b className="line-clamp-3 text-[13.5px] font-semibold leading-snug">{m.milestone ?? m.title}</b>
-                    <span className="font-mono text-[11px] text-muted tabular">
+                    <span className="text-[12px] text-muted tabular">
                       {fmtDate(m.date)}
                       {future && " · upcoming"}
                     </span>
                     {highlightId != null && m.providerIds.includes(highlightId) && (
-                      <span className="mx-auto w-fit rounded bg-med px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-surface">Your practice</span>
+                      <span className="mx-auto w-fit rounded-full bg-teal px-2 py-px text-[10px] font-bold uppercase tracking-[0.04em] text-white">Your practice</span>
                     )}
                     {detail && <p className="line-clamp-3 text-[12px] leading-snug text-muted">{detail}</p>}
                     <div>
@@ -176,7 +176,7 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
                   {col === total && <Cap side="end" />}
                   <span aria-hidden="true" className="z-10 size-3.5 rounded-full border-2" style={{ borderColor: color, background: future ? "var(--surface)" : color }} />
                   <span
-                    className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-serif text-[22px] font-bold leading-none tabular ${above ? "top-[calc(50%+14px)]" : "bottom-[calc(50%+14px)]"}`}
+                    className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[18px] font-extrabold leading-none tracking-[-0.02em] tabular ${above ? "top-[calc(50%+14px)]" : "bottom-[calc(50%+14px)]"}`}
                     style={{ color }}
                   >
                     {m.date.slice(0, 4)}
@@ -193,7 +193,7 @@ export function CaseJourney({ events, today, highlightId, vertical = false }: { 
 
 /** This column's piece of the axis; pieces join into one line. Upcoming stretches are dashed. */
 function AxisLine({ future }: { future: boolean }) {
-  return <span aria-hidden="true" className={`absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 ${future ? "border-dashed border-muted" : "border-solid border-ink/70"}`} />;
+  return <span aria-hidden="true" className={`absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 ${future ? "border-dashed border-muted" : "border-solid border-ink/25"}`} />;
 }
 
 function AxisPiece({ column, future, capStart, capEnd }: { column: number; future: boolean; capStart: boolean; capEnd: boolean }) {
@@ -210,9 +210,9 @@ function AxisPiece({ column, future, capStart, capEnd }: { column: number; futur
 function Rail({ future, capStart, capEnd }: { future: boolean; capStart: boolean; capEnd: boolean }) {
   return (
     <>
-      <span aria-hidden="true" className={`absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 ${future ? "border-dashed border-muted" : "border-solid border-ink/70"}`} />
-      {capStart && <span aria-hidden="true" className="absolute left-1/2 top-0 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink" />}
-      {capEnd && <span aria-hidden="true" className="absolute bottom-0 left-1/2 size-2 -translate-x-1/2 translate-y-1/2 rounded-full bg-ink" />}
+      <span aria-hidden="true" className={`absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 ${future ? "border-dashed border-muted" : "border-solid border-ink/25"}`} />
+      {capStart && <span aria-hidden="true" className="absolute left-1/2 top-0 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink/40" />}
+      {capEnd && <span aria-hidden="true" className="absolute bottom-0 left-1/2 size-2 -translate-x-1/2 translate-y-1/2 rounded-full bg-ink/40" />}
     </>
   );
 }
@@ -221,7 +221,7 @@ function Cap({ side }: { side: "start" | "end" }) {
   return (
     <span
       aria-hidden="true"
-      className={`absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-ink ${side === "start" ? "left-0 -translate-x-1/2" : "right-0 translate-x-1/2"}`}
+      className={`absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-ink/40 ${side === "start" ? "left-0 -translate-x-1/2" : "right-0 translate-x-1/2"}`}
     />
   );
 }

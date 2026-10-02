@@ -46,20 +46,21 @@
   --sunk: var(--surface-2);
   --legal: var(--accent);
   --legal-soft: var(--accent-soft);
-  --med: var(--green);
-  --med-soft: var(--green-soft);
+  --med: var(--teal);
+  --med-soft: var(--teal-soft);
   --warn: var(--amber);
   --warn-soft: var(--amber-soft);
   --crit: var(--red);
   --crit-soft: var(--red-soft);
   --ok: var(--green);
-  --j1: #d92d20;
-  --j2: #c2620a;
-  --j3: #b58900;
-  --j4: #0a8a4f;
-  --j5: #0e8a9a;
-  --j6: #2b59f5;
-  --j7: #6e4ae0;
+  /* Case journey milestones: one calm accent family (red stays reserved for late). */
+  --j1: #2b59f5;
+  --j2: #3d4fd6;
+  --j3: #5047c9;
+  --j4: #6e4ae0;
+  --j5: #2b59f5;
+  --j6: #3d4fd6;
+  --j7: #5047c9;
 }
 
 @theme inline {
@@ -84,6 +85,7 @@
   --color-violet: var(--violet);
   --color-violet-soft: var(--violet-soft);
   --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
   --color-hl: var(--hl);
   --color-sunk: var(--sunk);
   --color-legal: var(--legal);
@@ -123,6 +125,7 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
+@layer components {
 /* Section label: 12px uppercase muted (§7.3). */
 .label {
   font-size: 11.5px;
@@ -296,6 +299,7 @@ h3 {
 }
 .switch.lg input:checked + span::after {
   transform: translateX(20px);
+}
 }
 
 /* Sheets (§6.4): slide up 220ms, backdrop fade 200ms. */

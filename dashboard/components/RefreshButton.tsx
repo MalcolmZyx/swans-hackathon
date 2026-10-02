@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Icon } from "./Icons";
 
 export function RefreshButton({ pulledAt }: { pulledAt: string | null }) {
   const router = useRouter();
@@ -25,19 +26,23 @@ export function RefreshButton({ pulledAt }: { pulledAt: string | null }) {
     }
   };
 
+  const pulled = pulledAt ? new Date(pulledAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : null;
+
   return (
-    <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[12.5px] text-muted">
-      {pulledAt && <span>Data pulled from Clio {new Date(pulledAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}</span>}
-      <button
-        type="button"
-        onClick={refresh}
-        disabled={state === "running"}
-        className="rounded-md border border-line bg-surface px-2.5 py-1 font-medium text-ink hover:border-legal disabled:cursor-wait disabled:opacity-60"
-      >
+    <div className="relative flex shrink-0 items-center gap-2">
+      {pulled && (
+        <span title={`Data pulled from Clio ${pulled}`} className="inline-flex items-center gap-1.5 rounded-full bg-green-soft px-3 py-1 text-[12.5px] font-semibold text-green max-[560px]:hidden">
+          <span className="dot bg-green" />
+          Read-only from Clio
+          <span className="font-medium max-[900px]:hidden">· pulled {pulled}</span>
+        </span>
+      )}
+      <button type="button" onClick={refresh} disabled={state === "running"} className="btn sm disabled:cursor-wait">
+        <Icon name="sync" size={14} className={state === "running" ? "animate-spin" : ""} />
         {state === "running" ? "Pulling from Clio and summarizing…" : "Refresh from Clio"}
       </button>
       {(state === "error" || state === "warning") && (
-        <span role="alert" className={`basis-full text-right ${state === "error" ? "text-crit" : "text-warn"}`}>
+        <span role="alert" className={`absolute right-0 top-[calc(100%+10px)] w-max max-w-[360px] rounded-[9px] px-3 py-2 text-[12.5px] font-medium shadow-lg ${state === "error" ? "bg-red-soft text-red" : "bg-amber-soft text-amber"}`}>
           {error}
         </span>
       )}

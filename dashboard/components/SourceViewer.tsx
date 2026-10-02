@@ -281,7 +281,7 @@ function PdfView({ cite }: { cite: PdfCite }) {
     return () => {
       cancelled = true;
       task?.cancel();
-      doc?.destroy();
+      doc?.loadingTask.destroy();
     };
   }, [cite.doc, cite.page, width]);
 

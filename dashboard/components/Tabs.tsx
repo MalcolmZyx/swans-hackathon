@@ -11,9 +11,9 @@ export type TabItem = {
 };
 
 const BADGE = {
-  neutral: "bg-sunk text-muted",
-  crit: "bg-crit-soft text-crit",
-  warn: "bg-warn-soft text-warn",
+  neutral: "bg-line-2 text-muted",
+  crit: "bg-red-soft text-red",
+  warn: "bg-amber-soft text-amber",
 };
 
 /**
@@ -49,9 +49,9 @@ export function Tabs({ tabs, initial, tone }: { tabs: TabItem[]; initial?: strin
   };
 
   return (
-    <div ref={root} className="grid gap-8">
-      <div className="sticky top-0 z-30 -mx-4 border-b border-line bg-bg/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
-        <div role="tablist" aria-label="Dashboard sections" onKeyDown={onKeyDown} className="-mb-px flex gap-1 overflow-x-auto">
+    <div ref={root} className="grid gap-7">
+      <div className="sticky top-14 z-30 -mx-8 bg-bg/85 px-8 py-2.5 [backdrop-filter:saturate(1.6)_blur(14px)] max-[760px]:top-[52px] max-[760px]:-mx-4 max-[760px]:px-4">
+        <div role="tablist" aria-label="Dashboard sections" onKeyDown={onKeyDown} className="flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-[12px] bg-line-2 p-[3px] ring-1 ring-line">
           {tabs.map((t) => {
             const on = t.id === active;
             return (
@@ -67,13 +67,13 @@ export function Tabs({ tabs, initial, tone }: { tabs: TabItem[]; initial?: strin
                 aria-controls={`panel-${t.id}`}
                 tabIndex={on ? 0 : -1}
                 onClick={() => select(t.id)}
-                className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-3 py-3 text-[14px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 ${
-                  tone === "legal" ? "focus-visible:outline-legal" : "focus-visible:outline-med"
-                } ${on ? `text-ink ${tone === "legal" ? "border-legal" : "border-med"}` : "border-transparent text-muted hover:border-line hover:text-ink"}`}
+                className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-[9px] px-3.5 py-2 text-[13.5px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 ${
+                  tone === "legal" ? "focus-visible:outline-accent" : "focus-visible:outline-teal"
+                } ${on ? "bg-surface text-ink shadow-[0_1px_3px_rgba(14,23,38,.12)]" : "text-muted hover:text-ink"}`}
               >
                 {t.label}
                 {t.badge && (
-                  <span title={t.badge.title} className={`rounded-full px-1.5 py-px text-[11.5px] font-semibold tabular ${BADGE[t.badge.tone ?? "neutral"]}`}>
+                  <span title={t.badge.title} className={`rounded-full px-1.5 py-px text-[11px] font-bold tabular ${BADGE[t.badge.tone ?? "neutral"]}`}>
                     {t.badge.value}
                   </span>
                 )}
@@ -83,7 +83,7 @@ export function Tabs({ tabs, initial, tone }: { tabs: TabItem[]; initial?: strin
         </div>
       </div>
       {tabs.map((t) => (
-        <div key={t.id} role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={t.id !== active} className="grid min-w-0 gap-10">
+        <div key={t.id} role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={t.id !== active} className="grid min-w-0 gap-8">
           {t.content}
         </div>
       ))}

@@ -11,7 +11,7 @@ import { journey, loadCase, medicalProviders, providerView, today as getToday } 
 import { fmtDate, money, relative } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Provider view · Case Desk" };
+export const metadata: Metadata = { title: "Provider view · ROSS" };
 
 export default async function ProviderPage({ searchParams }: { searchParams: Promise<{ provider?: string; tab?: string }> }) {
   const data = await loadCase();
@@ -49,9 +49,9 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
   const firstVisit = view.events.find((e) => mine(e.providerIds));
 
   return (
-    <>
+    <div className="min-h-screen flex-1 bg-bg">
       <AppHeader active="provider" pulledAt={view.pulledAt} />
-      <main className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-24 pt-8 sm:px-6">
+      <main className="mx-auto grid w-full max-w-[1100px] gap-8 px-8 pb-24 pt-9 max-[760px]:px-4 max-[760px]:pt-6">
         <div className="grid gap-5">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <ProviderPicker providers={providers.map((p) => ({ id: p.id, name: p.name, role: p.role }))} current={provider.id} />
@@ -60,15 +60,15 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
             </p>
           </div>
           <p className="text-[14px] text-muted">
-            <span className="font-medium text-med">{provider.role}</span> <Cite source={provider.source} />
+            <span className="font-semibold text-teal">{provider.role}</span> <Cite source={provider.source} />
           </p>
         </div>
 
-        <Card className="grid gap-5 border-t-4 border-t-med">
+        <Card className="grid gap-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="grid gap-1">
-              <div className="font-mono text-[11.5px] font-medium uppercase tracking-wider text-med">Patient</div>
-              <h1 className="font-serif text-[clamp(26px,3.6vw,36px)] font-bold leading-tight">
+              <div className="label text-teal">Patient</div>
+              <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.03em] max-[760px]:text-[25px]">
                 {client.name} <Cite source={view.matter.clientSource} />
               </h1>
               <div className="text-[14px] text-muted">
@@ -78,7 +78,7 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
             <div className="grid gap-1.5 justify-items-end">
               {hipaa && (
                 <span className="inline-flex items-center gap-2">
-                  <Pill tone={hipaa.value ? "med" : "crit"}>{hipaa.value ? "✓ HIPAA authorization on file" : "No HIPAA authorization"}</Pill>
+                  <Pill tone={hipaa.value ? "ok" : "warn"}>{hipaa.value ? "✓ HIPAA authorization on file" : "No HIPAA authorization"}</Pill>
                   <Cite source={hipaa.source} />
                 </span>
               )}
@@ -87,25 +87,25 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
           </div>
           <dl className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-x-8 gap-y-4 text-[14px]">
             <div className="grid gap-1">
-              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">Injury date</dt>
+              <dt className="label">Injury date</dt>
               <dd>
                 {fmtDate(doi?.value as string)} ({relative(doi?.value as string, today)}) <Cite source={doi?.source} />
               </dd>
             </div>
             <div className="grid gap-1">
-              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">How it happened</dt>
+              <dt className="label">How it happened</dt>
               <dd>
                 {summary?.value as string} <Cite source={summary?.source} />
               </dd>
             </div>
             <div className="grid gap-1">
-              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">Where</dt>
+              <dt className="label">Where</dt>
               <dd>
                 {location?.value as string} <Cite source={location?.source} />
               </dd>
             </div>
             <div className="grid gap-1">
-              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted">Treatment status</dt>
+              <dt className="label">Treatment status</dt>
               <dd>
                 {treatment?.value as string} <Cite source={treatment?.source} />
               </dd>
@@ -146,7 +146,7 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                                 Asked <b className="tabular">{r.timesAsked}</b> time{r.timesAsked === 1 ? "" : "s"}
                                 {r.lastAsked && `, most recently ${fmtDate(r.lastAsked)}`}
                               </span>
-                              <span className={r.lastReply ? "" : "text-crit"}>{r.lastReply ? `Your last reply: ${fmtDate(r.lastReply)}` : "No reply on file"}</span>
+                              <span className={r.lastReply ? "" : "font-semibold text-amber"}>{r.lastReply ? `Your last reply: ${fmtDate(r.lastReply)}` : "No reply on file"}</span>
                               <Cite source={r.source} />
                             </div>
                           </Card>
@@ -163,11 +163,11 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                         <>
                           <div className="flex items-baseline justify-between gap-2">
                             <span className="text-muted">Total billed</span>
-                            <span className="text-[24px] font-semibold tabular">{money(billed, true)}</span>
+                            <span className="text-[26px] font-[750] tracking-[-0.02em] tabular">{money(billed, true)}</span>
                           </div>
                           <ul className="grid gap-2">
                             {view.charges.map((c) => (
-                              <li key={c.id} className="grid gap-0.5 border-t border-line pt-2 text-[13.5px]">
+                              <li key={c.id} className="grid gap-0.5 border-t border-line-2 pt-2 text-[13.5px]">
                                 <div className="flex justify-between gap-2">
                                   <span>
                                     Services {fmtDate(c.serviceStart)}
@@ -183,7 +183,7 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                           </ul>
                         </>
                       )}
-                      <div className="grid gap-2 rounded-lg bg-sunk p-3 text-[13.5px]">
+                      <div className="grid gap-2 rounded-[12px] bg-surface-2 p-3.5 ring-1 ring-line-2 text-[13.5px]">
                         <p>
                           <Term id="nofault">No-fault benefits</Term> of {money(num("noFault")?.value)} are <b>used up</b>, so further bills are unlikely to be paid until the case resolves. <Cite source={num("noFault")?.source} />
                         </p>
@@ -211,8 +211,8 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                       <ul>
                         {upcoming.length === 0 && <li className="p-4 text-muted">No upcoming appointments on file.</li>}
                         {upcoming.map((e) => (
-                          <li key={e.id} className={`grid grid-cols-[86px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3 last:border-0 ${mine(e.providerIds) ? "bg-med-soft" : ""}`}>
-                            <div className="font-mono text-[12.5px] text-med tabular">{fmtDate(e.date, { weekday: "short", month: "short", day: "numeric" })}</div>
+                          <li key={e.id} className={`grid grid-cols-[86px_minmax(0,1fr)] gap-3 border-b border-line-2 px-4 py-3 last:border-0 ${mine(e.providerIds) ? "bg-med-soft" : ""}`}>
+                            <div className="text-[12.5px] font-semibold text-teal tabular">{fmtDate(e.date, { weekday: "short", month: "short", day: "numeric" })}</div>
                             <div className="grid gap-0.5">
                               <span className="font-medium leading-snug">{e.title}</span>
                               <span className="text-[12.5px] text-muted">
@@ -237,10 +237,10 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                     <ul>
                       {messages.length === 0 && <li className="p-4 text-muted">No messages on file.</li>}
                       {messages.map((m) => (
-                        <li key={m.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
+                        <li key={m.id} className="grid gap-0.5 border-b border-line-2 px-4 py-3 last:border-0">
                           <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <span className="font-medium leading-snug">{m.title}</span>
-                            <span className="font-mono text-[12px] text-muted tabular">{fmtDate(m.date)}</span>
+                            <span className="text-[12.5px] text-muted tabular">{fmtDate(m.date)}</span>
                           </div>
                           <span className="text-[12.5px] text-muted">
                             {m.kind === "call" ? "Call" : "Email"} · {m.outbound ? "From the firm" : "From your office"} <Cite source={m.source} />
@@ -264,7 +264,7 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                         {view.careTeam
                           .filter((p) => p.id !== provider.id)
                           .map((p) => (
-                            <li key={p.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
+                            <li key={p.id} className="grid gap-0.5 border-b border-line-2 px-4 py-3 last:border-0">
                               <span className="font-medium">
                                 {p.name} <Cite source={p.contactSource} />
                               </span>
@@ -282,11 +282,11 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
                       <ul>
                         {view.documents.length === 0 && <li className="p-4 text-muted">No documents from {provider.name} are filed on the matter yet.</li>}
                         {view.documents.map((d) => (
-                          <li key={d.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
+                          <li key={d.id} className="grid gap-0.5 border-b border-line-2 px-4 py-3 last:border-0">
                             <span className="font-medium">
                               {d.title} <Cite source={d.source} />
                             </span>
-                            <span className="font-mono text-[12px] text-muted">
+                            <span className="text-[12.5px] text-muted">
                               {d.folder} · received {fmtDate(d.date)}
                             </span>
                           </li>
@@ -313,6 +313,6 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
           ]}
         />
       </main>
-    </>
+    </div>
   );
 }

@@ -14,11 +14,11 @@ import { daysBetween, fmtDate, money, relative } from "@/lib/format";
 import type { CaseEvent, Party } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Lawyer view · Case Desk" };
+export const metadata: Metadata = { title: "Lawyer view · ROSS" };
 
 const CATEGORY: Record<Party["category"], { label: string; tone: "legal" | "crit" | "warn" | "med" | "neutral" }> = {
   client: { label: "Client", tone: "legal" },
-  adverse: { label: "Other side", tone: "crit" },
+  adverse: { label: "Other side", tone: "neutral" },
   insurer: { label: "Insurance", tone: "warn" },
   medical: { label: "Medical provider", tone: "med" },
   other: { label: "Other", tone: "neutral" },
@@ -68,12 +68,12 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
   const partyOrder: Party["category"][] = ["client", "adverse", "insurer", "medical", "other"];
 
   return (
-    <>
+    <div className="min-h-screen flex-1 bg-bg">
       <AppHeader active="lawyer" pulledAt={data.pulledAt} />
-      <main className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-24 pt-8 sm:px-6">
+      <main className="mx-auto grid w-full max-w-[1100px] gap-8 px-8 pb-24 pt-9 max-[760px]:px-4 max-[760px]:pt-6">
         {/* Case header */}
         <div className="grid gap-4">
-          <div className="flex flex-wrap items-center gap-2 font-mono text-[12px] font-medium uppercase tracking-wider text-muted">
+          <div className="flex flex-wrap items-center gap-2 label">
             <span>Matter {matter.displayNumber}</span>
             <span aria-hidden="true">·</span>
             <span>{matter.practiceArea}</span>
@@ -83,7 +83,7 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
             <span>Opened {fmtDate(matter.openDate)}</span>
             <Cite source={matter.source} />
           </div>
-          <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-bold leading-tight">{matter.description}</h1>
+          <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.03em] max-[760px]:text-[25px]">{matter.description}</h1>
           <StageTracker stages={matter.stages} current={matter.stage} source={matter.source} />
         </div>
 
@@ -101,8 +101,8 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                     {/* On wide screens the journey takes the brief's height (contain:size keeps its long list from setting the row height) and scrolls inside. */}
                     <Card className="flex flex-col gap-3 lg:min-h-[560px] lg:[contain:size]">
                       <div className="grid gap-1">
-                        <div className="font-mono text-[11.5px] font-medium uppercase tracking-wider text-legal">Case journey</div>
-                        <h2 className="font-serif text-[22px] font-semibold">Key moments in the case</h2>
+                        <div className="label text-accent">Case journey</div>
+                        <h2 className="text-[20px] font-bold tracking-[-0.02em]">Key moments in the case</h2>
                         <p className="text-[14px] text-muted">The legal milestones from the crash to today, then the appointments and open tasks still ahead. The full record is on the Timeline tab.</p>
                       </div>
                       <CaseJourney events={journey(events, today)} today={today} vertical />
@@ -113,10 +113,10 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                     ) : (
                     <Card className="grid content-start gap-4">
                       <div className="grid gap-1">
-                        <div className="font-mono text-[11.5px] font-medium uppercase tracking-wider text-legal">New to this case? Start here</div>
-                        <h2 className="font-serif text-[22px] font-semibold">The case in one minute</h2>
+                        <div className="label text-accent">New to this case? Start here</div>
+                        <h2 className="text-[20px] font-bold tracking-[-0.02em]">The case in one minute</h2>
                       </div>
-                      <ul className="grid gap-3 text-[15px]">
+                      <ul className="grid gap-3 text-[15px] leading-relaxed">
                         <li>
                           <b>{matter.client.name}</b> was hurt in a car crash on <b>{fmtDate(doi?.value as string)}</b> ({relative(doi?.value as string, today)}) at {location?.value as string}.{" "}
                           <Cite source={doi?.source} /> <Cite source={location?.source} />
@@ -153,7 +153,7 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
 
                   <Card className="grid content-start gap-4">
                     <div className="flex items-baseline justify-between gap-2">
-                      <h2 className="font-serif text-[22px] font-semibold">Needs attention</h2>
+                      <h2 className="text-[20px] font-bold tracking-[-0.02em]">Needs attention</h2>
                       <span className="text-[13px] text-muted tabular">
                         {pending.length} open tasks{overdue.length ? `, ${overdue.length} overdue` : ""}
                       </span>
@@ -162,9 +162,9 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                       {pending.map((t) => {
                         const late = t.date < today;
                         return (
-                          <li key={t.id} className={`grid gap-1 rounded-lg border p-3 ${late ? "border-crit bg-crit-soft" : "border-line"}`}>
+                          <li key={t.id} className={`grid gap-1.5 rounded-[12px] border p-3.5 ${late ? "border-[#f6c9c4] bg-red-soft" : "border-line bg-surface"}`}>
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                              <span className="font-medium leading-snug">{t.title}</span>
+                              <span className="font-semibold leading-snug">{t.title}</span>
                               <Pill tone={late ? "crit" : "warn"}>{late ? `Overdue · due ${fmtDate(t.date)}` : `Due ${fmtDate(t.date)}`}</Pill>
                             </div>
                             <p className="text-[13px] text-muted">{t.body}</p>
@@ -205,8 +205,8 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                       <ul>
                         {soon.length === 0 && <li className="p-4 text-muted">Nothing scheduled in the next 30 days.</li>}
                         {soon.map((e) => (
-                          <li key={e.id} className="grid grid-cols-[86px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3 last:border-0">
-                            <div className="font-mono text-[12.5px] text-legal tabular">
+                          <li key={e.id} className="grid grid-cols-[86px_minmax(0,1fr)] gap-3 border-b border-line-2 px-4 py-3 last:border-0">
+                            <div className="text-[12.5px] font-semibold text-accent tabular">
                               {fmtDate(e.date, { weekday: "short", month: "short", day: "numeric" })}
                             </div>
                             <div className="grid gap-0.5">
@@ -224,7 +224,7 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                   <Section title="Records requests" intro={<>What the firm has asked each provider for (<Term id="recordsRequest">records requests</Term>), and how many times.</>}>
                     <Card className="overflow-x-auto p-0">
                       <table className="w-full text-[13.5px]">
-                        <thead className="bg-sunk text-left font-mono text-[11px] uppercase tracking-wider text-muted">
+                        <thead className="label bg-surface-2 text-left">
                           <tr>
                             <th className="px-4 py-2 font-medium">Provider</th>
                             <th className="px-4 py-2 font-medium">Asked</th>
@@ -236,7 +236,7 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                           {data.requests.map((r) => {
                             const late = r.status === "pending" && r.due < today;
                             return (
-                              <tr key={r.taskId} className="border-t border-line align-top">
+                              <tr key={r.taskId} className="border-t border-line-2 align-top">
                                 <td className="px-4 py-3">
                                   <div className="font-medium">{providerName(r.providerId)}</div>
                                   <div className="text-[12.5px] text-muted">{r.title}</div>
@@ -263,11 +263,11 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
               content: (
                 <>
                   <Section eyebrow="Damages and coverage" title="Key numbers" intro={<>What the case is worth, what insurance can pay, and what comes off the top. Hover the underlined terms for a definition.</>}>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-px overflow-hidden rounded-xl border border-line bg-line">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-px overflow-hidden rounded-[16px] border border-line bg-line shadow-soft">
                       <Stat label={<Term id="specials">Medical bills (specials)</Term>} value={money(num("specials")?.value)} source={num("specials")?.source ?? null} />
                       <Stat label="Lost wages claimed" value={money(num("wageLoss")?.value)} source={num("wageLoss")?.source ?? null} />
                       <Stat label="Estimated case value" value={money(value?.value)} source={value?.source ?? null} />
-                      <Stat label={<Term id="limits">Defendant&apos;s policy limit</Term>} value={money(limit?.value)} source={limit?.source ?? null} tone="text-crit" />
+                      <Stat label={<Term id="limits">Defendant&apos;s policy limit</Term>} value={money(limit?.value)} source={limit?.source ?? null} />
                       <Stat label={<Term id="lien">Medicaid lien</Term>} value={money(num("lien")?.value)} source={num("lien")?.source ?? null} note="Repaid from any recovery" />
                       <Stat label={<Term id="nofault">No-fault benefits</Term>} value={money(num("noFault")?.value)} source={num("noFault")?.source ?? null} note="Used up" />
                     </div>
@@ -279,8 +279,8 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                             {money(limit?.value)} limit against {money(value?.value)} value <Cite source={limit?.source} /> <Cite source={value?.source} />
                           </span>
                         </div>
-                        <div className="relative h-4 overflow-hidden rounded-full bg-crit-soft" role="img" aria-label={`Policy limit covers ${coverPct} percent of estimated value`}>
-                          <div className="h-full rounded-full bg-legal" style={{ width: `${coverPct}%` }} />
+                        <div className="relative h-3 overflow-hidden rounded-full bg-line-2" role="img" aria-label={`Policy limit covers ${coverPct} percent of estimated value`}>
+                          <div className="h-full rounded-full bg-accent" style={{ width: `${coverPct}%` }} />
                         </div>
                         <div className="flex justify-between text-[12.5px] text-muted tabular">
                           <span>Covered by the defendant&apos;s policy: {money(limit?.value)}</span>
@@ -290,13 +290,13 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                     )}
                   </Section>
 
-                          <Section title="Case costs paid by the firm" intro="Out-of-pocket costs the firm has advanced. None are reimbursed yet.">
+                  <Section title="Case costs paid by the firm" intro="Out-of-pocket costs the firm has advanced. None are reimbursed yet.">
                     <Card className="overflow-x-auto p-0">
                       <table className="w-full text-[13.5px]">
                         <tbody>
                           {data.costs.map((c) => (
-                            <tr key={c.id} className="border-b border-line last:border-0">
-                              <td className="whitespace-nowrap px-4 py-2.5 font-mono text-[12.5px] text-muted tabular">{fmtDate(c.date)}</td>
+                            <tr key={c.id} className="border-b border-line-2 last:border-0">
+                              <td className="whitespace-nowrap px-4 py-2.5 text-[12.5px] text-muted tabular">{fmtDate(c.date)}</td>
                               <td className="px-4 py-2.5">
                                 <b className="font-medium">{c.category}</b> <span className="text-muted">{c.description}</span>
                               </td>
@@ -306,7 +306,7 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                               </td>
                             </tr>
                           ))}
-                          <tr className="bg-sunk font-semibold">
+                          <tr className="bg-surface-2 font-semibold">
                             <td className="px-4 py-2.5" colSpan={2}>
                               Total
                             </td>
@@ -335,14 +335,14 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                             <Pill tone={CATEGORY[cat].tone}>{CATEGORY[cat].label}</Pill>
                             <ul className="grid gap-2">
                               {group.map((p) => (
-                                <li key={p.id} className="grid gap-0.5 border-b border-line pb-2 last:border-0">
+                                <li key={p.id} className="grid gap-0.5 border-b border-line-2 pb-2 last:border-0">
                                   <span className="font-medium">
                                     {p.name} <Cite source={p.contactSource} />
                                   </span>
                                   <span className="text-[13px] text-muted">
                                     {p.role} <Cite source={p.source} />
                                   </span>
-                                  {(p.email || p.phone) && <span className="font-mono text-[12px] text-muted">{[p.email, p.phone].filter(Boolean).join(" · ")}</span>}
+                                  {(p.email || p.phone) && <span className="text-[12.5px] text-muted">{[p.email, p.phone].filter(Boolean).join(" · ")}</span>}
                                 </li>
                               ))}
                             </ul>
@@ -358,14 +358,14 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                         .sort(([a], [b]) => a.localeCompare(b))
                         .map(([folder, docs]) => (
                           <div key={folder} className="grid gap-1.5">
-                            <h3 className="font-mono text-[12px] font-medium uppercase tracking-wider text-muted">{folder}</h3>
+                            <h3 className="label">{folder}</h3>
                             <ul className="grid gap-1.5">
                               {docs.map((d) => (
                                 <li key={d.id} className="flex flex-wrap items-baseline justify-between gap-2 text-[14px]">
                                   <span>
                                     {d.title} <Cite source={d.source} />
                                   </span>
-                                  <span className="font-mono text-[12px] text-muted tabular">received {fmtDate(d.date)}</span>
+                                  <span className="text-[12.5px] text-muted tabular">received {fmtDate(d.date)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -385,7 +385,7 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
                     <table className="w-full text-[13.5px]">
                       <tbody>
                         {data.facts.map((f) => (
-                          <tr key={f.name} className="border-b border-line align-top last:border-0">
+                          <tr key={f.name} className="border-b border-line-2 align-top last:border-0">
                             <th scope="row" className="w-56 px-4 py-3 text-left font-medium">
                               {f.name}
                             </th>
@@ -404,6 +404,6 @@ export default async function LawyerPage({ searchParams }: { searchParams: Promi
           ]}
         />
       </main>
-    </>
+    </div>
   );
 }

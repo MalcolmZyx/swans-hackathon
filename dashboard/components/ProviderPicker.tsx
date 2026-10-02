@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 export function ProviderPicker({ providers, current }: { providers: { id: number; name: string; role: string }[]; current: number }) {
   const router = useRouter();
   return (
-    <label className="grid gap-1 text-[13px] font-medium text-muted">
-      Viewing as
+    <label className="grid gap-1.5">
+      <span className="label">Viewing as</span>
       <select
         id="provider-picker"
         value={current}
@@ -16,7 +16,7 @@ export function ProviderPicker({ providers, current }: { providers: { id: number
           params.set("provider", e.target.value);
           router.push(`/provider?${params}`);
         }}
-        className="max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-[15px] font-semibold text-ink focus-visible:outline-2 focus-visible:outline-med"
+        className="h-[42px] max-w-full rounded-[11px] border border-line bg-surface px-3 text-[15px] font-semibold text-ink shadow-soft hover:border-[#d3d7de] focus-visible:outline-2 focus-visible:outline-accent"
       >
         {providers.map((p) => (
           <option key={p.id} value={p.id}>
