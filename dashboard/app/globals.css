@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* Palette: cool slate neutrals; ink blue for the legal side, clinical teal for the medical side. */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --sunk: #eceff4;
+  --ink: #18212f;
+  --muted: #5a6577;
+  --line: #dce1e9;
+  --legal: #2f45a6;
+  --legal-soft: #e7eafb;
+  --med: #0d7a67;
+  --med-soft: #e0f3ef;
+  --warn: #9a5306;
+  --warn-soft: #fdf0dd;
+  --crit: #b42318;
+  --crit-soft: #fde8e6;
+  --ok: #157a3c;
+  --k-milestone: #18212f;
+  --k-note: #2f45a6;
+  --k-email: #7446b8;
+  --k-call: #a33f8f;
+  --k-calendar: #0d7a67;
+  --k-task: #9a5306;
+  --k-document: #566173;
+  --k-charge: #b42318;
+  /* Case journey: a warm-to-cool sequence, one color per milestone */
+  --j1: #d24b42;
+  --j2: #df7a1c;
+  --j3: #c99a06;
+  --j4: #4b8f3c;
+  --j5: #1d93a8;
+  --j6: #3566c8;
+  --j7: #2b3a67;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e131a;
+    --surface: #161d27;
+    --sunk: #1d2531;
+    --ink: #e5e9ef;
+    --muted: #9aa4b3;
+    --line: #2a3442;
+    --legal: #9aa9ff;
+    --legal-soft: #20284a;
+    --med: #4fd0b4;
+    --med-soft: #133a33;
+    --warn: #f0a54a;
+    --warn-soft: #3a2a14;
+    --crit: #f58b80;
+    --crit-soft: #3f1d1a;
+    --ok: #5cd38a;
+    --k-milestone: #e5e9ef;
+    --k-note: #9aa9ff;
+    --k-email: #c09af2;
+    --k-call: #ec8fd6;
+    --k-calendar: #4fd0b4;
+    --k-task: #f0a54a;
+    --k-document: #a6b0bf;
+    --k-charge: #f58b80;
+    --j1: #f2827a;
+    --j2: #f4a35a;
+    --j3: #e6c34a;
+    --j4: #7fc56e;
+    --j5: #5ccbdc;
+    --j6: #86a8f2;
+    --j7: #b4c0e6;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-legal: var(--legal);
+  --color-legal-soft: var(--legal-soft);
+  --color-med: var(--med);
+  --color-med-soft: var(--med-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-crit: var(--crit);
+  --color-crit-soft: var(--crit-soft);
+  --color-ok: var(--ok);
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-serif: var(--font-serif4), Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glossary terms: dotted underline with a definition on hover or focus. */
+.term {
+  position: relative;
+  border-bottom: 1px dotted currentColor;
+  cursor: help;
+}
+.term .term-def {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  width: max-content;
+  max-width: 280px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 12.5px;
+  line-height: 1.45;
+  font-weight: 400;
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+}
+.term:hover .term-def,
+.term:focus .term-def {
+  display: block;
+}
+.term:focus {
+  outline: 2px solid var(--legal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
