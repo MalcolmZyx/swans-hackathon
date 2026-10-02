@@ -10,17 +10,18 @@ const COLORS = ["var(--j1)", "var(--j2)", "var(--j3)", "var(--j4)", "var(--j5)",
 /**
  * Horizontal milestone timeline: points evenly spaced on one axis, captions alternating
  * above and below, with the year on the opposite side of the axis from its caption.
- * A "Today" marker sits between the last past and first upcoming milestone.
+ * A "Today" marker sits between the past and the upcoming points. Appointments and open tasks
+ * that are not milestones are tagged by kind and drawn in that kind's timeline color.
  */
-export function CaseJourney({ milestones, today, highlightId }: { milestones: CaseEvent[]; today: string; highlightId?: number }) {
+export function CaseJourney({ events, today, highlightId }: { events: CaseEvent[]; today: string; highlightId?: number }) {
   const scroller = useRef<HTMLDivElement>(null);
   const todayRef = useRef<HTMLLIElement>(null);
-  if (!milestones.length) return null;
+  if (!events.length) return null;
 
-  // Grid column of the Today marker; milestones after it shift one column right.
-  const t = milestones.findIndex((m) => m.date > today);
-  const todayIdx = t === -1 ? milestones.length : t;
-  const total = milestones.length + 1;
+  // Grid column of the Today marker; events after it shift one column right.
+  const t = events.findIndex((m) => m.date > today);
+  const todayIdx = t === -1 ? events.length : t;
+  const total = events.length + 1;
   const colOf = (i: number) => i + 1 + (i >= todayIdx ? 1 : 0);
   const columns = Array.from({ length: total }, (_, c) => (c === todayIdx ? "112px" : "minmax(150px, 1fr)")).join(" ");
 
@@ -48,7 +49,7 @@ export function CaseJourney({ milestones, today, highlightId }: { milestones: Ca
         </button>
       </div>
       <div ref={scroller} className="overflow-x-auto rounded-xl border border-line bg-surface">
-        <ol className="grid min-w-max px-6 py-6" style={{ gridTemplateColumns: columns, gridTemplateRows: "auto 72px auto" }} aria-label="Key moments in order">
+        <ol className="grid min-w-max px-6 py-6" style={{ gridTemplateColumns: columns, gridTemplateRows: "auto 72px auto" }} aria-label="Key moments and what is coming up, in order">
           {/* Today marker: a dashed line through all three rows */}
           <li ref={todayRef} className="relative flex justify-center" style={{ gridColumn: todayIdx + 1, gridRow: "1 / 4" }} aria-label={`Today, ${fmtDate(today)}`}>
             <span aria-hidden="true" className="absolute inset-y-0 left-1/2 border-l-2 border-dashed border-legal/60" />
@@ -57,13 +58,13 @@ export function CaseJourney({ milestones, today, highlightId }: { milestones: Ca
               <span className="block font-mono text-[10.5px] font-normal opacity-90">{fmtDate(today, { month: "short", day: "numeric", year: "numeric" })}</span>
             </span>
           </li>
-          <AxisPiece column={todayIdx + 1} future={false} capStart={todayIdx === 0} capEnd={todayIdx === milestones.length} />
+          <AxisPiece column={todayIdx + 1} future={false} capStart={todayIdx === 0} capEnd={todayIdx === events.length} />
 
-          {milestones.map((m, i) => {
-            const color = COLORS[i % COLORS.length];
+          {events.map((m, i) => {
+            const color = m.milestone ? COLORS[i % COLORS.length] : m.kind === "task" ? "var(--k-task)" : "var(--k-calendar)";
             const above = i % 2 === 0;
             const future = m.date > today;
-            const detail = m.title !== m.milestone ? m.title : m.body;
+            const detail = m.milestone && m.title !== m.milestone ? m.title : m.body;
             const col = colOf(i);
             return (
               <li key={m.id} className="contents">
@@ -71,7 +72,12 @@ export function CaseJourney({ milestones, today, highlightId }: { milestones: Ca
                   {!above && <Stem color={color} future={future} />}
                   {!above && <Ring color={color} future={future} />}
                   <div className={`grid max-w-[180px] gap-1 text-center ${above ? "pb-2" : "pt-2"}`}>
-                    <b className="text-[13.5px] font-semibold leading-snug">{m.milestone}</b>
+                    {!m.milestone && (
+                      <span className="font-mono text-[10.5px] font-semibold uppercase tracking-wider" style={{ color }}>
+                        {m.kind === "task" ? "Task" : "Appointment"}
+                      </span>
+                    )}
+                    <b className="line-clamp-3 text-[13.5px] font-semibold leading-snug">{m.milestone ?? m.title}</b>
                     <span className="font-mono text-[11px] text-muted tabular">
                       {fmtDate(m.date)}
                       {future && " · upcoming"}

@@ -96,6 +96,22 @@ export type Matter = {
   clientSource: Source;
 };
 
+// Shape of data/brief.json, written by lib/brief.ts on each Refresh from Clio.
+
+/** One point in the AI brief. `sources` are record ids (see sourceIndex in lib/brief.ts). */
+export type BriefPoint = { label?: string; text: string; sources: string[] };
+
+export type Brief = {
+  generatedAt: string;
+  model: string;
+  pulledAt: string; // the Clio pull this brief describes
+  since: string | null; // the pull the user last saw ("last sign-in"); null on the first one
+  changeCount: number;
+  headline: string;
+  whatsNew: BriefPoint[];
+  overview: BriefPoint[];
+};
+
 export type CaseData = {
   generatedAt: string;
   pulledAt: string;

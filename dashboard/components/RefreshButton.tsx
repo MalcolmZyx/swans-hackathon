@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export function RefreshButton({ pulledAt }: { pulledAt: string | null }) {
   const router = useRouter();
-  const [state, setState] = useState<"idle" | "running" | "error">("idle");
+  const [state, setState] = useState<"idle" | "running" | "error" | "warning">("idle");
   const [error, setError] = useState("");
 
   const refresh = async () => {
@@ -15,7 +15,9 @@ export function RefreshButton({ pulledAt }: { pulledAt: string | null }) {
       const res = await fetch("/api/refresh", { method: "POST" });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || "Refresh failed");
-      setState("idle");
+      // The data refreshed but the AI summary didn't: say so, but still show the new data.
+      setState(body.warning ? "warning" : "idle");
+      setError(body.warning ?? "");
       router.refresh();
     } catch (e) {
       setState("error");
@@ -32,10 +34,10 @@ export function RefreshButton({ pulledAt }: { pulledAt: string | null }) {
         disabled={state === "running"}
         className="rounded-md border border-line bg-surface px-2.5 py-1 font-medium text-ink hover:border-legal disabled:cursor-wait disabled:opacity-60"
       >
-        {state === "running" ? "Pulling from Clio…" : "Refresh from Clio"}
+        {state === "running" ? "Pulling from Clio and summarizing…" : "Refresh from Clio"}
       </button>
-      {state === "error" && (
-        <span role="alert" className="basis-full text-right text-crit">
+      {(state === "error" || state === "warning") && (
+        <span role="alert" className={`basis-full text-right ${state === "error" ? "text-crit" : "text-warn"}`}>
           {error}
         </span>
       )}

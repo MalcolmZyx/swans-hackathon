@@ -10,7 +10,12 @@ export function ProviderPicker({ providers, current }: { providers: { id: number
       <select
         id="provider-picker"
         value={current}
-        onChange={(e) => router.push(`/provider?provider=${e.target.value}`)}
+        onChange={(e) => {
+          // Keep the open tab (?tab=) when switching providers.
+          const params = new URLSearchParams(window.location.search);
+          params.set("provider", e.target.value);
+          router.push(`/provider?${params}`);
+        }}
         className="max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-[15px] font-semibold text-ink focus-visible:outline-2 focus-visible:outline-med"
       >
         {providers.map((p) => (

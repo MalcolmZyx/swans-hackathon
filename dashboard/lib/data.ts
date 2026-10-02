@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { clioUrl } from "./clio";
-import type { CaseData, Party } from "./types";
+import type { CaseData, CaseEvent, Party } from "./types";
 
 const CASE_FILE = path.join(process.cwd(), "data", "case.json");
 
@@ -36,6 +36,11 @@ export async function loadCase(): Promise<CaseData | null> {
 
 export function medicalProviders(data: CaseData): Party[] {
   return data.parties.filter((p) => p.category === "medical");
+}
+
+/** What the case journey plots: the key moments, plus the appointments and open tasks still ahead. */
+export function journey<T extends CaseEvent>(events: T[], today: string): T[] {
+  return events.filter((e) => e.milestone || (e.date >= today && (e.kind === "calendar" || (e.kind === "task" && e.status === "pending"))));
 }
 
 /**

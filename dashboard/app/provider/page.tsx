@@ -4,15 +4,16 @@ import { CaseJourney } from "@/components/CaseJourney";
 import { Cite } from "@/components/Cite";
 import { ProviderPicker } from "@/components/ProviderPicker";
 import { Term } from "@/components/Term";
+import { Tabs } from "@/components/Tabs";
 import { Timeline } from "@/components/Timeline";
 import { Card, NoData, Pill, Section } from "@/components/ui";
-import { loadCase, medicalProviders, providerView, today as getToday } from "@/lib/data";
+import { journey, loadCase, medicalProviders, providerView, today as getToday } from "@/lib/data";
 import { fmtDate, money, relative } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Provider view · Case Desk" };
 
-export default async function ProviderPage({ searchParams }: { searchParams: Promise<{ provider?: string }> }) {
+export default async function ProviderPage({ searchParams }: { searchParams: Promise<{ provider?: string; tab?: string }> }) {
   const data = await loadCase();
   if (!data) {
     return (
@@ -23,7 +24,8 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
     );
   }
   const providers = medicalProviders(data);
-  const requested = Number((await searchParams).provider);
+  const { provider: requestedParam, tab } = await searchParams;
+  const requested = Number(requestedParam);
   // Default to the first provider with an open request from the firm.
   const fallback = data.requests.find((r) => r.status === "pending")?.providerId ?? providers[0]?.id;
   const provider = providers.find((p) => p.id === requested) ?? providers.find((p) => p.id === fallback)!;
@@ -49,7 +51,7 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <AppHeader active="provider" pulledAt={view.pulledAt} />
-      <main className="mx-auto grid w-full max-w-7xl gap-10 px-4 pb-24 pt-8 sm:px-6">
+      <main className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-24 pt-8 sm:px-6">
         <div className="grid gap-5">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <ProviderPicker providers={providers.map((p) => ({ id: p.id, name: p.name, role: p.role }))} current={provider.id} />
@@ -62,11 +64,6 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
           </p>
         </div>
 
-        <Section eyebrow="Treatment journey" title="Key moments in the patient's care" intro={`From the injury to upcoming treatment, oldest to newest. Moments involving ${provider.name} are marked.`}>
-          <CaseJourney milestones={view.events.filter((e) => e.milestone)} today={today} highlightId={provider.id} />
-        </Section>
-
-        {/* Patient */}
         <Card className="grid gap-5 border-t-4 border-t-med">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="grid gap-1">
@@ -116,168 +113,205 @@ export default async function ProviderPage({ searchParams }: { searchParams: Pro
           </dl>
         </Card>
 
-        {/* Requests + bills */}
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-          <Section
-            title="What the law firm needs from you"
-            intro={<>Open <Term id="recordsRequest">records requests</Term> and how often the firm has asked.</>}
-            aside={<Pill tone={openRequests.length ? "warn" : "ok"}>{openRequests.length} open</Pill>}
-          >
-            <div className="grid gap-3">
-              {view.requests.length === 0 && <Card className="text-muted">The firm has no requests on file for {provider.name}.</Card>}
-              {view.requests.map((r) => {
-                const late = r.status === "pending" && r.due < today;
-                return (
-                  <Card key={r.taskId} className={`grid gap-2 ${late ? "border-crit" : ""}`}>
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <b className="font-semibold leading-snug">{r.title}</b>
-                      <Pill tone={r.status === "complete" ? "ok" : late ? "crit" : "warn"}>
-                        {r.status === "complete" ? "Done" : late ? `Overdue since ${fmtDate(r.due)}` : `Due ${fmtDate(r.due)}`}
-                      </Pill>
+        <Tabs
+          tone="med"
+          initial={tab}
+          tabs={[
+            {
+              id: "requests",
+              label: "Requests & billing",
+              badge: openRequests.length ? { value: openRequests.length, tone: "warn", title: `${openRequests.length} open records requests` } : undefined,
+              content: (
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+                  <Section
+                    title="What the law firm needs from you"
+                    intro={<>Open <Term id="recordsRequest">records requests</Term> and how often the firm has asked.</>}
+                    aside={<Pill tone={openRequests.length ? "warn" : "ok"}>{openRequests.length} open</Pill>}
+                  >
+                    <div className="grid gap-3">
+                      {view.requests.length === 0 && <Card className="text-muted">The firm has no requests on file for {provider.name}.</Card>}
+                      {view.requests.map((r) => {
+                        const late = r.status === "pending" && r.due < today;
+                        return (
+                          <Card key={r.taskId} className={`grid gap-2 ${late ? "border-crit" : ""}`}>
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <b className="font-semibold leading-snug">{r.title}</b>
+                              <Pill tone={r.status === "complete" ? "ok" : late ? "crit" : "warn"}>
+                                {r.status === "complete" ? "Done" : late ? `Overdue since ${fmtDate(r.due)}` : `Due ${fmtDate(r.due)}`}
+                              </Pill>
+                            </div>
+                            <p className="text-[14px] text-muted">{r.detail}</p>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
+                              <span>
+                                Asked <b className="tabular">{r.timesAsked}</b> time{r.timesAsked === 1 ? "" : "s"}
+                                {r.lastAsked && `, most recently ${fmtDate(r.lastAsked)}`}
+                              </span>
+                              <span className={r.lastReply ? "" : "text-crit"}>{r.lastReply ? `Your last reply: ${fmtDate(r.lastReply)}` : "No reply on file"}</span>
+                              <Cite source={r.source} />
+                            </div>
+                          </Card>
+                        );
+                      })}
                     </div>
-                    <p className="text-[14px] text-muted">{r.detail}</p>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-                      <span>
-                        Asked <b className="tabular">{r.timesAsked}</b> time{r.timesAsked === 1 ? "" : "s"}
-                        {r.lastAsked && `, most recently ${fmtDate(r.lastAsked)}`}
-                      </span>
-                      <span className={r.lastReply ? "" : "text-crit"}>{r.lastReply ? `Your last reply: ${fmtDate(r.lastReply)}` : "No reply on file"}</span>
-                      <Cite source={r.source} />
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          </Section>
+                  </Section>
 
-          <Section title="Billing on file" intro="Your charges as recorded by the firm, and what affects payment.">
-            <Card className="grid gap-4">
-              {view.charges.length === 0 ? (
-                <p className="text-muted">No bills from {provider.name} are recorded on this case.</p>
-              ) : (
+                  <Section title="Billing on file" intro="Your charges as recorded by the firm, and what affects payment.">
+                    <Card className="grid gap-4">
+                      {view.charges.length === 0 ? (
+                        <p className="text-muted">No bills from {provider.name} are recorded on this case.</p>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="text-muted">Total billed</span>
+                            <span className="text-[24px] font-semibold tabular">{money(billed, true)}</span>
+                          </div>
+                          <ul className="grid gap-2">
+                            {view.charges.map((c) => (
+                              <li key={c.id} className="grid gap-0.5 border-t border-line pt-2 text-[13.5px]">
+                                <div className="flex justify-between gap-2">
+                                  <span>
+                                    Services {fmtDate(c.serviceStart)}
+                                    {c.serviceEnd !== c.serviceStart && ` to ${fmtDate(c.serviceEnd)}`}
+                                  </span>
+                                  <b className="tabular">{money(c.amount, true)}</b>
+                                </div>
+                                <span className="text-muted">
+                                  Payment status: {c.paymentStatus} · {c.file} <Cite source={c.source} />
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                      <div className="grid gap-2 rounded-lg bg-sunk p-3 text-[13.5px]">
+                        <p>
+                          <Term id="nofault">No-fault benefits</Term> of {money(num("noFault")?.value)} are <b>used up</b>, so further bills are unlikely to be paid until the case resolves. <Cite source={num("noFault")?.source} />
+                        </p>
+                        <p>
+                          A <Term id="lien">Medicaid lien</Term> of {money(num("lien")?.value, true)} is asserted against any recovery. <Cite source={num("lien")?.source} />
+                        </p>
+                      </div>
+                    </Card>
+                  </Section>
+                </div>
+              ),
+            },
+            {
+              id: "treatment",
+              label: "Treatment",
+              badge: upcoming.length ? { value: upcoming.length, title: `${upcoming.length} upcoming appointments` } : undefined,
+              content: (
                 <>
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-muted">Total billed</span>
-                    <span className="text-[24px] font-semibold tabular">{money(billed, true)}</span>
-                  </div>
-                  <ul className="grid gap-2">
-                    {view.charges.map((c) => (
-                      <li key={c.id} className="grid gap-0.5 border-t border-line pt-2 text-[13.5px]">
-                        <div className="flex justify-between gap-2">
-                          <span>
-                            Services {fmtDate(c.serviceStart)}
-                            {c.serviceEnd !== c.serviceStart && ` to ${fmtDate(c.serviceEnd)}`}
-                          </span>
-                          <b className="tabular">{money(c.amount, true)}</b>
-                        </div>
-                        <span className="text-muted">
-                          Payment status: {c.paymentStatus} · {c.file} <Cite source={c.source} />
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <Section eyebrow="Treatment journey" title="Key moments in the patient's care" intro={`From the injury to upcoming appointments and open tasks, oldest to newest. Moments involving ${provider.name} are marked.`}>
+                    <CaseJourney events={journey(view.events, today)} today={today} highlightId={provider.id} />
+                  </Section>
+
+                  <Section title="Patient's upcoming appointments" intro="Scheduled treatment across the care team. Yours are highlighted.">
+                    <Card className="p-0">
+                      <ul>
+                        {upcoming.length === 0 && <li className="p-4 text-muted">No upcoming appointments on file.</li>}
+                        {upcoming.map((e) => (
+                          <li key={e.id} className={`grid grid-cols-[86px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3 last:border-0 ${mine(e.providerIds) ? "bg-med-soft" : ""}`}>
+                            <div className="font-mono text-[12.5px] text-med tabular">{fmtDate(e.date, { weekday: "short", month: "short", day: "numeric" })}</div>
+                            <div className="grid gap-0.5">
+                              <span className="font-medium leading-snug">{e.title}</span>
+                              <span className="text-[12.5px] text-muted">
+                                {relative(e.date, today)} <Cite source={e.source} />
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </Card>
+                  </Section>
                 </>
-              )}
-              <div className="grid gap-2 rounded-lg bg-sunk p-3 text-[13.5px]">
-                <p>
-                  <Term id="nofault">No-fault benefits</Term> of {money(num("noFault")?.value)} are <b>used up</b>, so further bills are unlikely to be paid until the case resolves. <Cite source={num("noFault")?.source} />
-                </p>
-                <p>
-                  A <Term id="lien">Medicaid lien</Term> of {money(num("lien")?.value, true)} is asserted against any recovery. <Cite source={num("lien")?.source} />
-                </p>
-              </div>
-            </Card>
-          </Section>
-        </div>
+              ),
+            },
+            {
+              id: "messages",
+              label: "Messages",
+              badge: { value: messages.length, title: `${messages.length} emails and calls` },
+              content: (
+                <Section title="Messages with the firm" intro={`${messages.length} emails and calls between the firm and ${provider.name}, newest first.`}>
+                  <Card className="p-0">
+                    <ul>
+                      {messages.length === 0 && <li className="p-4 text-muted">No messages on file.</li>}
+                      {messages.map((m) => (
+                        <li key={m.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <span className="font-medium leading-snug">{m.title}</span>
+                            <span className="font-mono text-[12px] text-muted tabular">{fmtDate(m.date)}</span>
+                          </div>
+                          <span className="text-[12.5px] text-muted">
+                            {m.kind === "call" ? "Call" : "Email"} · {m.outbound ? "From the firm" : "From your office"} <Cite source={m.source} />
+                          </span>
+                          <p className="line-clamp-2 text-[13px] text-muted">{m.body}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                </Section>
+              ),
+            },
+            {
+              id: "care",
+              label: "Care team & records",
+              content: (
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <Section title="Care team" intro="Other providers treating this patient for the same injuries.">
+                    <Card className="p-0">
+                      <ul>
+                        {view.careTeam
+                          .filter((p) => p.id !== provider.id)
+                          .map((p) => (
+                            <li key={p.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
+                              <span className="font-medium">
+                                {p.name} <Cite source={p.contactSource} />
+                              </span>
+                              <span className="text-[13px] text-muted">
+                                {p.role} <Cite source={p.source} />
+                              </span>
+                            </li>
+                          ))}
+                      </ul>
+                    </Card>
+                  </Section>
 
-        {/* Messages + upcoming */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Section title="Messages with the firm" intro={`${messages.length} emails and calls between the firm and ${provider.name}, newest first.`}>
-            <Card className="max-h-[420px] overflow-y-auto p-0">
-              <ul>
-                {messages.length === 0 && <li className="p-4 text-muted">No messages on file.</li>}
-                {messages.map((m) => (
-                  <li key={m.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <span className="font-medium leading-snug">{m.title}</span>
-                      <span className="font-mono text-[12px] text-muted tabular">{fmtDate(m.date)}</span>
-                    </div>
-                    <span className="text-[12.5px] text-muted">
-                      {m.kind === "call" ? "Call" : "Email"} · {m.outbound ? "From the firm" : "From your office"} <Cite source={m.source} />
-                    </span>
-                    <p className="line-clamp-2 text-[13px] text-muted">{m.body}</p>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </Section>
-
-          <Section title="Patient's upcoming appointments" intro="Scheduled treatment across the care team. Yours are highlighted.">
-            <Card className="p-0">
-              <ul>
-                {upcoming.length === 0 && <li className="p-4 text-muted">No upcoming appointments on file.</li>}
-                {upcoming.map((e) => (
-                  <li key={e.id} className={`grid grid-cols-[86px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3 last:border-0 ${mine(e.providerIds) ? "bg-med-soft" : ""}`}>
-                    <div className="font-mono text-[12.5px] text-med tabular">{fmtDate(e.date, { weekday: "short", month: "short", day: "numeric" })}</div>
-                    <div className="grid gap-0.5">
-                      <span className="font-medium leading-snug">{e.title}</span>
-                      <span className="text-[12.5px] text-muted">
-                        {relative(e.date, today)} <Cite source={e.source} />
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </Section>
-        </div>
-
-        {/* Care team + records */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Section title="Care team" intro="Other providers treating this patient for the same injuries.">
-            <Card className="p-0">
-              <ul>
-                {view.careTeam
-                  .filter((p) => p.id !== provider.id)
-                  .map((p) => (
-                    <li key={p.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
-                      <span className="font-medium">
-                        {p.name} <Cite source={p.contactSource} />
-                      </span>
-                      <span className="text-[13px] text-muted">
-                        {p.role} <Cite source={p.source} />
-                      </span>
-                    </li>
-                  ))}
-              </ul>
-            </Card>
-          </Section>
-
-          <Section title="Records from your practice" intro="Documents on the matter that came from your office.">
-            <Card className="p-0">
-              <ul>
-                {view.documents.length === 0 && <li className="p-4 text-muted">No documents from {provider.name} are filed on the matter yet.</li>}
-                {view.documents.map((d) => (
-                  <li key={d.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
-                    <span className="font-medium">
-                      {d.title} <Cite source={d.source} />
-                    </span>
-                    <span className="font-mono text-[12px] text-muted">
-                      {d.folder} · received {fmtDate(d.date)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </Section>
-        </div>
-
-        <Section
-          title="Treatment and records timeline"
-          intro="The medical side of the case: appointments, records requests, records received and bills. Events involving your practice are highlighted."
-        >
-          <Timeline events={view.events} today={today} highlightId={provider.id} highlightLabel={provider.name.split(",")[0]} />
-        </Section>
+                  <Section title="Records from your practice" intro="Documents on the matter that came from your office.">
+                    <Card className="p-0">
+                      <ul>
+                        {view.documents.length === 0 && <li className="p-4 text-muted">No documents from {provider.name} are filed on the matter yet.</li>}
+                        {view.documents.map((d) => (
+                          <li key={d.id} className="grid gap-0.5 border-b border-line px-4 py-3 last:border-0">
+                            <span className="font-medium">
+                              {d.title} <Cite source={d.source} />
+                            </span>
+                            <span className="font-mono text-[12px] text-muted">
+                              {d.folder} · received {fmtDate(d.date)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </Card>
+                  </Section>
+                </div>
+              ),
+            },
+            {
+              id: "timeline",
+              label: "Timeline",
+              badge: { value: view.events.length, title: `${view.events.length} records` },
+              content: (
+                <Section
+                  title="Treatment and records timeline"
+                  intro="The medical side of the case: appointments, records requests, records received and bills. Events involving your practice are highlighted."
+                >
+                  <Timeline events={view.events} today={today} highlightId={provider.id} highlightLabel={provider.name.split(",")[0]} />
+                </Section>
+              ),
+            },
+          ]}
+        />
       </main>
     </>
   );
